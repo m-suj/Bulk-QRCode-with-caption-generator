@@ -3,7 +3,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 
-def create_qr_image(data, title, font_size, root='.'):
+def create_qr_image(data, title, root='.'):
     if not os.path.isdir(root):
         raise NotADirectoryError('NotADirectoryError: Provided destination is not a directory')
     qr = qrcode.QRCode(
@@ -19,12 +19,17 @@ def create_qr_image(data, title, font_size, root='.'):
     img.save(f'{root}/{title}.png')
     img = Image.open(f'{root}/{title}.png')
 
-    my_font = ImageFont.truetype('Dosis-Bold.ttf', font_size)
+    my_font = ImageFont.truetype('Dosis-Bold.ttf', 36)
     draw = ImageDraw.Draw(img)
+    print(title)
     draw.text((img.width / 2, img.height - 22), title, fill='black', font=my_font, anchor='mm')
     img.save(f"{root}/{title}.png")
 
 
+def bulk_create_qr_code(*data, labelling: callable = lambda x: f'{x}', root='.'):
+    for d in data:
+        create_qr_image(d, labelling(d), root)
+
+
 if __name__ == '__main__':
-    for i in range(1, 11):
-        create_qr_image(i, f'{i}^', 36, root='./1^.png')
+    bulk_create_qr_code(1, 2, 3, labelling=lambda x: f'{x}^', root='.')
